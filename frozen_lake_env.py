@@ -42,8 +42,9 @@ class FrozenLakeEnv:
         reward = 0
         done = False
 
-        reward -= 0.0 # step cost
+        reward -= 0 # step cost, can use 0.01
         if new_x < 0 or new_x >= self.map_x or new_y < 0 or new_y >= self.map_y: # out of bounds, dont move
+            reward -= 0 # out of bounds cost, can use 0.01
             return (x, y), reward, done
         
         new_tile = self.map[new_y, new_x] # ., H, G, S -> ice, hole, goal, start

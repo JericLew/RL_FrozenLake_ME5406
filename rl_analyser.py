@@ -28,11 +28,12 @@ class RLAnalyzer:
         """
         for rl_instance in self.rl_algorithms:
             name = rl_instance.algo_type
-            fig, axes = plt.subplots(2, 1, figsize=(10, 10))  # Two rows, one column
+            fig, axes = plt.subplots(3, 1, figsize=(10, 15))  # 3 rows, 1 column
 
             # Apply moving average
             smoothed_steps = moving_average(rl_instance.episode_steps, window_size)
-            smoothed_rewards = moving_average(rl_instance.episode_average_rewards, window_size)
+            smoothed_rewards = moving_average(rl_instance.episode_rewards, window_size)
+            smoothed_average_rewards = moving_average(rl_instance.episode_average_rewards, window_size)
             episodes = np.arange(len(smoothed_steps))  # Adjusted episode indices
 
             # Steps per episode
@@ -43,13 +44,21 @@ class RLAnalyzer:
             axes[0].legend()
             axes[0].grid()
 
-            # Average reward per episode
+            # Total reward per episode
             axes[1].plot(episodes, smoothed_rewards, label=f"Reward (Window={window_size})", color="red")
             axes[1].set_xlabel("Episode")
-            axes[1].set_ylabel("Average Reward")
-            axes[1].set_title(f"{name} - Average Reward per Episode (Smoothed)")
+            axes[1].set_ylabel("Total Reward")
+            axes[1].set_title(f"{name} - Total Reward per Episode (Smoothed)")
             axes[1].legend()
             axes[1].grid()
+
+            # Average reward per episode
+            axes[2].plot(episodes, smoothed_average_rewards, label=f"Reward (Window={window_size})", color="red")
+            axes[2].set_xlabel("Episode")
+            axes[2].set_ylabel("Average Reward")
+            axes[2].set_title(f"{name} - Average Reward per Episode (Smoothed)")
+            axes[2].legend()
+            axes[2].grid()
 
             plt.tight_layout()
             plt.savefig(f"{self.save_path}/{name}_performance.png")
@@ -60,7 +69,7 @@ class RLAnalyzer:
         Plots comparison of all RL algorithms in the same figure with two subplots.
         Uses moving average for smoothing.
         """
-        fig, axes = plt.subplots(2, 1, figsize=(10, 10))  # Two rows, one column
+        fig, axes = plt.subplots(3, 1, figsize=(10, 15))  # 3 rows, 1 column
 
         # Steps per episode
         for rl_instance in self.rl_algorithms:
@@ -74,17 +83,29 @@ class RLAnalyzer:
         axes[0].legend()
         axes[0].grid()
 
+        # Total reward per episode
+        for rl_instance in self.rl_algorithms:
+            name = rl_instance.algo_type
+            smoothed_total_rewards = moving_average(rl_instance.episode_rewards, window_size)
+            episodes = np.arange(len(smoothed_total_rewards))
+            axes[1].plot(episodes, smoothed_total_rewards, label=f"{name} Reward (Window={window_size})")
+        axes[1].set_xlabel("Episode")
+        axes[1].set_ylabel("Average Reward per Episode")
+        axes[1].set_title("Comparison of Total Rewards per Episode (Smoothed)")
+        axes[1].legend()
+        axes[1].grid()
+
         # Average reward per episode
         for rl_instance in self.rl_algorithms:
             name = rl_instance.algo_type
-            smoothed_rewards = moving_average(rl_instance.episode_average_rewards, window_size)
-            episodes = np.arange(len(smoothed_rewards))
-            axes[1].plot(episodes, smoothed_rewards, label=f"{name} Reward (Window={window_size})")
-        axes[1].set_xlabel("Episode")
-        axes[1].set_ylabel("Average Reward per Episode")
-        axes[1].set_title("Comparison of Rewards per Episode (Smoothed)")
-        axes[1].legend()
-        axes[1].grid()
+            smoothed_average_rewards = moving_average(rl_instance.episode_average_rewards, window_size)
+            episodes = np.arange(len(smoothed_average_rewards))
+            axes[2].plot(episodes, smoothed_average_rewards, label=f"{name} Reward (Window={window_size})")
+        axes[2].set_xlabel("Episode")
+        axes[2].set_ylabel("Average Reward per Episode")
+        axes[2].set_title("Comparison of Average Rewards per Episode (Smoothed)")
+        axes[2].legend()
+        axes[2].grid()
 
         plt.tight_layout()
         plt.savefig(f"{self.save_path}/comparison.png")

@@ -21,6 +21,7 @@ class RLBase:
 
         self.algo_type = None
         self.episode_steps = [] # length of each episode
+        self.episode_rewards = [] # total reward for each episode
         self.episode_average_rewards = [] # (total reward / step) for each episode
         self.success_count = 0
         self.failure_count = 0
@@ -209,8 +210,9 @@ class FirstVisitMonteCarlo(RLBase):
                 self.update_policy(policy_table[state], Q_table[state])
             # collect data for analysis
             self.episode_steps.append(len(state_list))
+            self.episode_rewards.append(sum(reward_list))
             self.episode_average_rewards.append(sum(reward_list)/len(state_list))
-            if reward_list[-1] == 1:
+            if reward_list[-1] > 0.8:
                 self.success_count += 1
             else:
                 self.failure_count += 1
@@ -245,6 +247,9 @@ class SARSA(RLBase):
         policy_table = self.init_policy_table()
         Q_table = self.init_Q_table()
         for episode in range(self.num_episode):
+            # self.epsilon = max(self.epsilon * 0.999, 0.01) # decay epsilon
+            # if episode % 100 == 0:
+            #     print(f"Episode: {episode}, Epsilon: {self.epsilon}")
             step   = 0
             done   = False
             state  = self.env.reset()
@@ -264,8 +269,9 @@ class SARSA(RLBase):
                     break
             # collect data for analysis
             self.episode_steps.append(step)
+            self.episode_rewards.append(sum(reward_list))
             self.episode_average_rewards.append(sum(reward_list)/step)
-            if reward_list[-1] == 1:
+            if reward_list[-1] > 0.8:
                 self.success_count += 1
             else:
                 self.failure_count += 1
@@ -301,6 +307,9 @@ class QLearning(RLBase):
         policy_table = self.init_policy_table()
         Q_table = self.init_Q_table()
         for episode in range(self.num_episode):
+            # self.epsilon = max(self.epsilon * 0.999, 0.01) # decay epsilon
+            # if episode % 100 == 0:
+            #     print(f"Episode: {episode}, Epsilon: {self.epsilon}")
             step   = 0
             done   = False
             state  = self.env.reset()
@@ -318,8 +327,9 @@ class QLearning(RLBase):
                     break
             # collect data for analysis
             self.episode_steps.append(step)
+            self.episode_rewards.append(sum(reward_list))
             self.episode_average_rewards.append(sum(reward_list)/step)
-            if reward_list[-1] == 1:
+            if reward_list[-1] > 0.8:
                 self.success_count += 1
             else:
                 self.failure_count += 1
